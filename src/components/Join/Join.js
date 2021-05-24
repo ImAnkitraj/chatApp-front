@@ -2,6 +2,7 @@ import React,{useState} from 'react'
 import './Join.css'
 import axios from 'axios';
 import {useHistory} from 'react-router-dom'
+import { ENDPOINT } from '../../constants';
 function Join() {
 
     const history = useHistory();
@@ -12,7 +13,7 @@ function Join() {
 
     const login = (e) => {
       e.preventDefault();
-      axios.post("http://localhost:5000/login",{
+      axios.post(`${ENDPOINT}/login`,{
         username,
         password
       })
@@ -39,7 +40,7 @@ function Join() {
 
     const signup = (e) => {
       e.preventDefault();
-      axios.post("http://localhost:5000/register",{
+      axios.post(`${ENDPOINT}/register`,{
         username,
         password
       })
