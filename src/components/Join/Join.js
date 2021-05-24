@@ -72,7 +72,9 @@ function Join() {
                     <h1 className='heading'>Login</h1>
                     <div><input placeholder="Username" className="joinInput" type="text" onChange={e=>setUsername(e.target.value)}/></div>
                     <div><input placeholder="Password" className="joinInput mt-20" type="password" onChange={e=>setPassword(e.target.value)}/></div>
-                    <button className='button mt-20' onClick={login} type='submit'>Login In</button>
+                    <button 
+                      onKeyPress={event => event.key === 'Enter' ? ()=>login() : null}
+                      className='button mt-20' onClick={login} type='submit'>Login In</button>
                     <p style={{color:"white",cursor:"pointer"}}onClick={()=>setIsLogin(false)}>Switch to Sign Up</p>
                   </>
                 ):(
@@ -80,7 +82,9 @@ function Join() {
                     <h1 className='heading'>Sign Up</h1>
                     <div><input placeholder="Username" className="joinInput" type="text" onChange={e=>setUsername(e.target.value)}/></div>
                     <div><input placeholder="Password" className="joinInput mt-20" type="password" onChange={e=>setPassword(e.target.value)}/></div>
-                    <button className='button mt-20' onClick={signup} type='submit'>Sign Up</button>
+                    <button 
+                      onKeyPress={event => event.key === 'Enter' ? ()=>signup() : null}
+                      className='button mt-20' onClick={signup} type='submit'>Sign Up</button>
                     <p style={{color:"white", cursor:"pointer"}} onClick={()=>setIsLogin(true)}>Switch to Log in</p>
                   </>
                 )
