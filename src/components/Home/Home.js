@@ -14,7 +14,7 @@ function Home() {
     const [searchText, setSearchText] = useState('')
 
     useEffect(()=>{
-        axios.get(`http://localhost:5000/get_friends/${localStorage.getItem('userId')}`)
+        axios.get(`${ENDPOINT}/get_friends/${localStorage.getItem('userId')}`)
         .then((res)=>{
             console.log(res.data.friends)
             setFriends(res.data.friends)
@@ -33,7 +33,7 @@ function Home() {
     }
 
     useEffect(()=>{
-        axios.get(`http://localhost:5000/get_room/${roomId}`)
+        axios.get(`${ENDPOINT}/get_room/${roomId}`)
         .then((res)=>{
             console.log('room',res?.data?.room)
 
@@ -71,7 +71,7 @@ function Home() {
 
     const search = (e) =>{
         e.preventDefault();
-        axios.post('http://localhost:5000/search',{searchText})
+        axios.post(`${ENDPOINT}/search`,{searchText})
     }
     return (
         <div className='home-container'>
