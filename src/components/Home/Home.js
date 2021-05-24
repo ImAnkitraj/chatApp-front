@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import './Home.css';
 import io from 'socket.io-client';
 import ScrollToBottom from 'react-scroll-to-bottom';
-const ENDPOINT = 'http://localhost:5000/'
+import { ENDPOINT } from '../../constants';
 const socket = io(ENDPOINT)
 
 function Home() {
