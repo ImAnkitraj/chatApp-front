@@ -8,7 +8,7 @@ function Join() {
     const [password ,setPassword] = useState('');
     const [username ,setUsername] = useState('');
     const [isLogin, setIsLogin] = useState(true);
-    const [message, setMessage] = useState('')
+    const [, setMessage] = useState('')
 
     const login = (e) => {
       e.preventDefault();

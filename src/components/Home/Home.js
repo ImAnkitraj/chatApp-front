@@ -29,6 +29,7 @@ function Home() {
             if(_.friendId.toString() === localStorage.getItem('userId').toString()){
                 setRoomId(_.roomId.toString())
             }
+            return _
         })
     }
 
