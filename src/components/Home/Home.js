@@ -1,46 +1,60 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import './Home.css';
 import io from 'socket.io-client';
 import ScrollToBottom from 'react-scroll-to-bottom';
 import { ENDPOINT } from '../../constants';
+import TelegramIcon from '@material-ui/icons/Telegram'
+import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined'
+import ExitToAppIcon from '@material-ui/icons/ExitToApp'
+import ChatImage from '../../ChatImage';
+import { useHistory } from 'react-router';
+import Loading from '../Loading/Loading';
+import LinearProgress from '@material-ui/core/LinearProgress';
+const FriendList = React.lazy(()=>import('./FriendList'));
+
+
 const socket = io(ENDPOINT)
 
 function Home() {
-    const [friends, setFriends] = useState([])
-    const [roomId, setRoomId] = useState('')
-    const [messages, setMessages] = useState([])
+
+    const history = useHistory();
+    const [searchFriends, setSearchFriends] = useState([])
+    const [roomId, setRoomId] = useState('');
+    const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState('');
-    const [searchText, setSearchText] = useState('')
+    const [searchText, setSearchText] = useState('');
+    const [friends, setFriends] = useState([])
+    const [friend, setFriend] = useState()
+    const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingMessages, setIsLoadingMessages] = useState();
+    const [isSendingMessage, setIsSendingMessage] = useState()
 
     useEffect(()=>{
         axios.get(`${ENDPOINT}/get_friends/${localStorage.getItem('userId')}`)
         .then((res)=>{
             console.log(res.data.friends)
             setFriends(res.data.friends)
+            setIsLoading(false);
         })
         .catch((err)=>{
             console.log(err)
         })
     },[])
 
-    const openChat = (friend) =>{
-        friend.friends.map((_)=>{
-            if(_.friendId.toString() === localStorage.getItem('userId').toString()){
-                setRoomId(_.roomId.toString())
-            }
-            return _
-        })
-    }
-
     useEffect(()=>{
+        if(searchText.trim() === '')
+            setSearchFriends([])
+    },[searchText])
+    useEffect(()=>{
+        setIsLoadingMessages(true);
         axios.get(`${ENDPOINT}/get_room/${roomId}`)
         .then((res)=>{
             console.log('room',res?.data?.room)
-
             const m = res?.data?.room?.messages.map(m=>{
                 return {message:m.message, user:m.user}
             })
+            setIsLoadingMessages(false);
             console.log('messages', m)
             setMessages(m)
             socket.emit('join',{roomId:roomId},()=>{});
@@ -50,36 +64,48 @@ function Home() {
         })
     },[roomId])
 
-    useEffect(()=>{
-        socket.on('message',(message)=>{
-            if(messages){
-                setMessages([...messages, message])
-            }
-            else{
-                setMessages([message])
-            }
-        })
-    },[messages])
+    socket.on('message',(message)=>{
+        if(messages){
+            setMessages([...messages, message])
+        }
+        else{
+            setMessages([message])
+        }
+    })
 
     //function to send message
     const sendMessage = (e) => {
         e.preventDefault();
         if(message){
+            setIsSendingMessage(true);
             let userId = localStorage.getItem('userId');
-            socket.emit('sendMessage', {message:message, userId: userId,roomId: roomId},()=>{setMessage('')})
+
+            socket.emit('sendMessage', {message:message, userId: userId,roomId: roomId},()=>{setMessage(''); setIsSendingMessage(false)})
         }
     }
 
+    const logout = () =>{
+        localStorage.clear();
+        history.push('/')
+    }
     const search = (e) =>{
         e.preventDefault();
+        if(searchText.trim() === ''){
+            return;
+        }
         axios.post(`${ENDPOINT}/search`,{searchText})
+        .then((res)=>{
+            console.log('search',res.data)
+            setSearchFriends(res.data)
+        })
     }
-    return (
+    return isLoading ? <Loading/> : (
         <div className='home-container'>
             <div className='home-body'>
                 <div className='home-body-left'>
-                    <div className='home-header'>
-                        header
+                    <div className='home-header-left'>
+                        <h2>AI Chat</h2>
+                        <ExitToAppIcon onClick={logout} style={{cursor:'pointer'}}/>
                     </div>
                     <div className='home-search'>
                         <input 
@@ -90,24 +116,22 @@ function Home() {
                             onKeyPress={event => event.key === 'Enter' ? search(event) : null}
                             placeholder="Search friends"
                         />
-                        <button className="search-button" onClick={e => search(e)}>Search</button>
+                        <button className="search-button" onClick={e => search(e)}><SearchOutlinedIcon style={{background:'lightyellow'}}/></button>
                     </div>
-                    <div className='home-friends'>
-                        {
-                            friends.map(friend => {
-                                return <p onClick={()=>openChat(friend)} key={friend._id}>{friend.username}</p>
-                            })
-                        }
-                    </div>
+                    <Suspense fallback={<Loading/>}>
+                        <FriendList setFriend={setFriend} setFriends={setFriends} searchFriends = {searchFriends} roomId={roomId} friends={friends} setRoomId={setRoomId}/>
+                    </Suspense>
                 </div>
                 <div className='home-body-right'>
-                    <div className='home-header'>
-                        header
-                    </div>
 
                     {
                         roomId ? (
+                            isLoadingMessages ? <Loading/>:
                             <>
+                            <div className='home-header-right'>
+                                <h3>{friend ? friend.username.toUpperCase() : <>Chat</>}</h3>
+                            </div>
+                            {isSendingMessage && <LinearProgress/>}
                             <div className='home-chat'>
                                 <ScrollToBottom>
                                 {
@@ -127,7 +151,6 @@ function Home() {
                                     })
                                 }
                                 </ScrollToBottom>
-
                             </div>
                             <div className='home-input-container'>
                                 <input type='text' 
@@ -137,11 +160,13 @@ function Home() {
                                     value={message} 
                                     onChange={e=>setMessage(e.target.value)}
                                 />
-                                <button className="home-input-button" onClick={e => sendMessage(e)}>Send</button>
+                                <button className="home-input-button" onClick={e => sendMessage(e)}><TelegramIcon/> </button>
                             </div>
                             </>
                         ):(
-                            <></>
+                            <div className='chat-image'>
+                                <ChatImage/>
+                            </div>
                         )
                     }
                 </div>

@@ -1,8 +1,10 @@
-import React,{useState} from 'react'
+import React,{useEffect, useState} from 'react'
 import './Join.css'
 import axios from 'axios';
 import {useHistory} from 'react-router-dom'
 import { ENDPOINT } from '../../constants';
+import Loading from '../Loading/Loading'
+
 function Join() {
 
     const history = useHistory();
@@ -10,6 +12,7 @@ function Join() {
     const [username ,setUsername] = useState('');
     const [isLogin, setIsLogin] = useState(true);
     const [, setMessage] = useState('')
+    const [isLoading, setIsLoading] = useState(true);
 
     const login = (e) => {
       e.preventDefault();
@@ -19,12 +22,11 @@ function Join() {
       })
       .then((res)=>{
         console.log('login',res.data);
-        localStorage.clear()
-
         if(res.data.status){
           localStorage.setItem('token', res.data.token)
           localStorage.setItem('userId', res.data.user._id)
           localStorage.setItem('username', res.data.user.username);
+          localStorage.setItem('friends',JSON.stringify(res.data.user.friends))
           history.push('/home');
         }
         else{
@@ -46,7 +48,6 @@ function Join() {
       })
       .then((res)=>{
         console.log('login',res.data);
-        localStorage.clear()
         if(res.data.status){
           localStorage.setItem('token', res.data.token)
           localStorage.setItem('userId', res.data.user._id)
@@ -63,7 +64,11 @@ function Join() {
       })
     }
 
-    return (
+    useEffect(() => {
+      setIsLoading(false);
+    }, [])
+
+    return isLoading ? <Loading/> : (
         <div className='joinOuterContainer'>
             <div className='joinInnerContainer'>
               {
