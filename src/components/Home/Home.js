@@ -18,6 +18,7 @@ const socket = io(ENDPOINT)
 
 function Home() {
 
+    const userId = localStorage.getItem('userId');
     const history = useHistory();
     const [searchFriends, setSearchFriends] = useState([])
     const [roomId, setRoomId] = useState('');
@@ -64,22 +65,17 @@ function Home() {
         })
     },[roomId])
 
-    socket.on('message',(message)=>{
-        if(messages){
+    useEffect(()=>{
+        socket.on('message',(message)=>{
             setMessages([...messages, message])
-        }
-        else{
-            setMessages([message])
-        }
-    })
+        });
+    },[messages])
 
     //function to send message
     const sendMessage = (e) => {
         e.preventDefault();
         if(message){
             setIsSendingMessage(true);
-            let userId = localStorage.getItem('userId');
-
             socket.emit('sendMessage', {message:message, userId: userId,roomId: roomId},()=>{setMessage(''); setIsSendingMessage(false)})
         }
     }

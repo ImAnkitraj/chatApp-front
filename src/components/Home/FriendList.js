@@ -6,7 +6,6 @@ import AddIcon from '@material-ui/icons/Add'
 function FriendList({setRoomId,setFriend,friends, setFriends,searchFriends, roomId}) {
     let f = []
     const friendLocal  = JSON.parse(localStorage.getItem('friends'))
-    console.log('friends',friends)
     friendLocal.map(_=> {
         f.push(_.friendId)
         return _

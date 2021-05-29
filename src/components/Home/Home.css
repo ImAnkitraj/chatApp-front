@@ -128,9 +128,9 @@
 }
 
 .home-chat{
-    height: 93%;
+    height: 84%;
     overflow-y: scroll;
-    padding: 0 10px;
+    padding: 0 10px 10px 10px;
     -ms-text-overflow: none;
     scrollbar-width: none;
 }
@@ -142,12 +142,12 @@
 
 
 .home-input-container{
-    width: 100%;
+    border-top: 1px solid orange;
+    width: 80vw;
     height: 7%;
-    position: sticky;
+    position: fixed;
     bottom: 0;
     right: 0;
-    border-radius: 20px;
 }
 
 .home-input{
@@ -218,4 +218,10 @@ justify-content: flex-end;
     justify-content: center;
     opacity: 0.8;
     padding:20px;
+}
+.MuiLinearProgress-colorPrimary{
+    background-color: lightyellow !important;
+}
+.MuiLinearProgress-barColorPrimary {
+    background-color: orange !important;
 }

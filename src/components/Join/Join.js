@@ -80,7 +80,7 @@ function Join() {
                     <button 
                       onKeyPress={event => event.key === 'Enter' ? ()=>login() : null}
                       className='button mt-20' onClick={login} type='submit'>Login In</button>
-                    <p style={{color:"white",cursor:"pointer"}}onClick={()=>setIsLogin(false)}>Switch to Sign Up</p>
+                    <p className='switch' onClick={()=>setIsLogin(false)}>Switch to Sign Up</p>
                   </>
                 ):(
                   <>
@@ -90,7 +90,7 @@ function Join() {
                     <button 
                       onKeyPress={event => event.key === 'Enter' ? ()=>signup() : null}
                       className='button mt-20' onClick={signup} type='submit'>Sign Up</button>
-                    <p style={{color:"white", cursor:"pointer"}} onClick={()=>setIsLogin(true)}>Switch to Log in</p>
+                      <p className='switch' onClick={()=>setIsLogin(true)}>Switch to Log in</p>
                   </>
                 )
               }
