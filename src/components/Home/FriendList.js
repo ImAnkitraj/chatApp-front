@@ -3,14 +3,25 @@ import axios from 'axios';
 import { ENDPOINT } from '../../constants';
 import AddIcon from '@material-ui/icons/Add'
 
-function FriendList({setRoomId,setFriend,friends, setFriends,searchFriends, roomId}) {
+function FriendList({setRoomId,setFriend,friends,setFriends,searchFriends, roomId}) {
     let f = []
     const friendLocal  = JSON.parse(localStorage.getItem('friends'))
     friendLocal?.map(_=> {
         f.push(_.friendId)
         return _
     });
-    
+
+    const getFriends = () => {
+        axios.get(`${ENDPOINT}/get_friends/${localStorage.getItem('userId')}`)
+        .then((res)=>{
+            console.log(res.data.friends)
+            setFriends(res.data.friends)
+        })
+        .catch((err)=>{
+            console.log(err)
+        })
+    }
+       
     const openChat = (friend) =>{
         setFriend(friend)
         friend?.friends.map((_)=>{
@@ -34,11 +45,8 @@ function FriendList({setRoomId,setFriend,friends, setFriends,searchFriends, room
         })
         .then((res)=>{
             console.log('user afetr add friends',res.data)
-            if(res.data.user[0]._id === friend._id)
-                setFriends([...friends, res.data.user[0]])
-            else
-                setFriends([...friends, res.data.user[1]])
-
+            localStorage.setItem('friends', JSON.stringify(res.data.user[0].friends))
+            getFriends();
         })
         .catch((err)=>{
             console.log('error in add frined', err)
@@ -47,7 +55,7 @@ function FriendList({setRoomId,setFriend,friends, setFriends,searchFriends, room
 
     return (
         <div className='home-friends'>
-            { searchFriends.length > 0 && <h4 className="list-heading">Search Results</h4>}
+            { searchFriends.length > 0 && <h4 className="list-heading">Search Results</h4>  }
 
             {
                 searchFriends?.map(_=> {
