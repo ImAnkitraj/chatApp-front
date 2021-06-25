@@ -57,7 +57,7 @@ function Home() {
             })
             setIsLoadingMessages(false);
             console.log('messages', m)
-            setMessages(m)
+            setMessages([...m])
             socket.emit('join',{roomId:roomId},()=>{});
         })
         .catch((err)=>{
@@ -67,6 +67,7 @@ function Home() {
 
     useEffect(()=>{
         socket.on('message',(message)=>{
+            console.log('new message',message)
             setMessages([...messages, message])
         });
     },[messages])

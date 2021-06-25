@@ -6,14 +6,14 @@ import AddIcon from '@material-ui/icons/Add'
 function FriendList({setRoomId,setFriend,friends, setFriends,searchFriends, roomId}) {
     let f = []
     const friendLocal  = JSON.parse(localStorage.getItem('friends'))
-    friendLocal.map(_=> {
+    friendLocal?.map(_=> {
         f.push(_.friendId)
         return _
     });
     
     const openChat = (friend) =>{
         setFriend(friend)
-        friend.friends.map((_)=>{
+        friend?.friends.map((_)=>{
             if(_.friendId.toString() === localStorage.getItem('userId').toString()){
                 setRoomId(_.roomId.toString())
                 console.log(roomId)
@@ -34,7 +34,11 @@ function FriendList({setRoomId,setFriend,friends, setFriends,searchFriends, room
         })
         .then((res)=>{
             console.log('user afetr add friends',res.data)
-            setFriends([...friends, res.data.user[0]])
+            if(res.data.user[0]._id === friend._id)
+                setFriends([...friends, res.data.user[0]])
+            else
+                setFriends([...friends, res.data.user[1]])
+
         })
         .catch((err)=>{
             console.log('error in add frined', err)
@@ -58,7 +62,7 @@ function FriendList({setRoomId,setFriend,friends, setFriends,searchFriends, room
             }
             <h4 className="list-heading" >Friends List</h4>
             {
-                friends.map(friend => {
+                friends?.map(friend => {
                     return (<p className='single-friend' onClick={()=>openChat(friend)} key={friend._id}><h3>{friend.username}</h3></p>) 
                 })
             }
